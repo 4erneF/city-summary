@@ -1,10 +1,6 @@
 import unittest
 
-from processing.preprocessing import (
-    DEFAULT_DESCRIPTION,
-    preprocess_rate,
-    preprocess_weather,
-)
+from processing.preprocessing import preprocess_rate, preprocess_weather
 
 
 class PreprocessWeatherTest(unittest.TestCase):
@@ -16,9 +12,9 @@ class PreprocessWeatherTest(unittest.TestCase):
         result = preprocess_weather({"temp_c": 0.0, "description": "fog"})
         self.assertFalse(result["warm_clothes"])
 
-    def test_empty_description_gets_default(self) -> None:
-        result = preprocess_weather({"temp_c": 5.0, "description": "  "})
-        self.assertEqual(result["description"], DEFAULT_DESCRIPTION)
+    def test_description_is_kept(self) -> None:
+        result = preprocess_weather({"temp_c": 5.0, "description": "fog"})
+        self.assertEqual(result["description"], "fog")
 
 
 class PreprocessRateTest(unittest.TestCase):

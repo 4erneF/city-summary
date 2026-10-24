@@ -56,7 +56,7 @@ clients/                   # только общение с внешними API
 ├── weather.py             # get_weather(city) → dict
 └── rates.py               # get_rate(currency) → float
 processing/
-├── preprocessing.py       # правила: warm_clothes, expensive, описание по умолчанию
+├── preprocessing.py       # правила: warm_clothes, expensive
 └── service.py             # build_city_summary(city, currency="USD") → dict
 tests/                     # unittest + unittest.mock, без сети
 ```
@@ -67,13 +67,12 @@ tests/                     # unittest + unittest.mock, без сети
 - до 2 повторов после первой попытки при `Timeout`, `ConnectionError`, 500/502/503/504 и 429;
 - пауза между попытками — экспоненциальная (1 с, 2 с) со случайным jitter; при 429 берётся числовой `Retry-After` (не больше 30 с);
 - остальные 4xx не повторяются: повтор не исправит запрос;
-- перед использованием проверяются `Content-Type`, что тело — JSON, и обязательные поля с типами.
+- перед использованием проверяются `Content-Type`, что тело — JSON, и обязательные поля с типами (`temperature_2m`, `weather_code`, `rate`); некорректный ответ даёт код выхода 4.
 
 ## Правила предобработки
 
 1. `warm_clothes: true`, если температура ниже 0 °C.
 2. `expensive: true`, если курс выше 100 ₽.
-3. Пустое описание погоды заменяется на `no description`.
 
 ## Дополнительно
 

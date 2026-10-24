@@ -135,6 +135,7 @@ class WeatherClientTest(unittest.TestCase):
             {"temperature_2m": 5.0, "weather_code": None},
             {"temperature_2m": 5.0, "weather_code": "2"},
             {"temperature_2m": 5.0, "weather_code": True},
+            {"temperature_2m": 5.0, "weather_code": 42},
         ):
             with self.subTest(current=current):
                 get.side_effect = [
@@ -143,15 +144,6 @@ class WeatherClientTest(unittest.TestCase):
                 ]
                 with self.assertRaises(InvalidResponseError):
                     get_weather("Moscow")
-
-    def test_unknown_weather_code_gives_empty_description(self, get: mock.Mock) -> None:
-        get.side_effect = [
-            fake_response(payload={"results": [MOSCOW]}),
-            fake_response(
-                payload={"current": {"temperature_2m": 5.0, "weather_code": 42}}
-            ),
-        ]
-        self.assertEqual(get_weather("Moscow")["description"], "")
 
 
 @mock.patch("clients.http.requests.get")

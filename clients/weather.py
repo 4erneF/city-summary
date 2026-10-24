@@ -95,7 +95,10 @@ def get_weather(city: str) -> dict[str, Any]:
         raise InvalidResponseError(
             f"{SERVICE}: поле 'weather_code' отсутствует или не целое число"
         )
-    # Код корректный, но его нет в таблице: описание по умолчанию подставит
-    # preprocessing.
-    description = WEATHER_CODES.get(code, "")
-    return {"city": place["name"], "temp_c": temp_c, "description": description}
+    if code not in WEATHER_CODES:
+        raise InvalidResponseError(f"{SERVICE}: неизвестный weather_code {code}")
+    return {
+        "city": place["name"],
+        "temp_c": temp_c,
+        "description": WEATHER_CODES[code],
+    }
