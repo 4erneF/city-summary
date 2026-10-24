@@ -90,5 +90,12 @@ def get_weather(city: str) -> dict[str, Any]:
 
     temp_c = _require_number(current, "temperature_2m")
     code = current.get("weather_code")
-    description = WEATHER_CODES.get(code, "") if isinstance(code, int) else ""
+    # bool — подкласс int, его отсекаем отдельно.
+    if isinstance(code, bool) or not isinstance(code, int):
+        raise InvalidResponseError(
+            f"{SERVICE}: поле 'weather_code' отсутствует или не целое число"
+        )
+    # Код корректный, но его нет в таблице: описание по умолчанию подставит
+    # preprocessing.
+    description = WEATHER_CODES.get(code, "")
     return {"city": place["name"], "temp_c": temp_c, "description": description}

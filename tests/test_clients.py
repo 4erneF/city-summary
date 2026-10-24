@@ -16,6 +16,8 @@ from clients.errors import (
 from clients.rates import get_rate
 from clients.weather import get_weather
 
+MOSCOW = {"name": "Moscow", "latitude": 55.75, "longitude": 37.62}
+
 
 def fake_response(
     status: int = 200,
@@ -126,6 +128,30 @@ class WeatherClientTest(unittest.TestCase):
         ]
         with self.assertRaises(InvalidResponseError):
             get_weather("Moscow")
+
+    def test_invalid_weather_code(self, get: mock.Mock) -> None:
+        for current in (
+            {"temperature_2m": 5.0},
+            {"temperature_2m": 5.0, "weather_code": None},
+            {"temperature_2m": 5.0, "weather_code": "2"},
+            {"temperature_2m": 5.0, "weather_code": True},
+        ):
+            with self.subTest(current=current):
+                get.side_effect = [
+                    fake_response(payload={"results": [MOSCOW]}),
+                    fake_response(payload={"current": current}),
+                ]
+                with self.assertRaises(InvalidResponseError):
+                    get_weather("Moscow")
+
+    def test_unknown_weather_code_gives_empty_description(self, get: mock.Mock) -> None:
+        get.side_effect = [
+            fake_response(payload={"results": [MOSCOW]}),
+            fake_response(
+                payload={"current": {"temperature_2m": 5.0, "weather_code": 42}}
+            ),
+        ]
+        self.assertEqual(get_weather("Moscow")["description"], "")
 
 
 @mock.patch("clients.http.requests.get")
